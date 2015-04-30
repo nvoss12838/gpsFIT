@@ -17,31 +17,44 @@ def readData(filename):
   return dateNum,loc,uncert
 
 def compute(fun):
+  '''
+  computes a function at the value t specified in the function class 
+  '''
   value = 0
   for i in range(len(fun.equation)):
     method = getattr(fun.equation[i],inspect.getmembers(fun.equation[i],predicate=inspect.ismethod)[1][0])
     value += method()
   return value
+
+def writeModelData(times,modeledData):
+   f = open('modelTseries.txt','w')
+   for i in range(len(times)):
+     f.write('%s	%s\n' % (times[i],modeledData[i]))
+   return
  
 def model_tseries(times,funList):
+  '''
+  takes in measurement times and computes the value of the function at those times
+  '''
   modeledData = []
   for t in times:
       for fun in funList:
 	  fun.t = t 
       fun = function(funList)
       modeledData.append(compute(fun))
+  writeModelData(times,modeledData)
   return modeledData
 
 def parseFunFile(functionFile):
+    ''' 
+    parse the function file to return the wanted function and their arguments
+    '''
     funList = []
     lines = [line.strip() for line in open(functionFile)]
-    print lines
     for line in lines:
       functiontxt = line.split(' ')
       function = functiontxt[0]
-      print function
       args = [float(item) for item in functiontxt[1:]]
-      print args
       funList.append(eval(function)(*args))
     return funList
     

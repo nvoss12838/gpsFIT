@@ -36,9 +36,7 @@ class function(object):
 		print a latex string using matplotlib representing the function
 		'''
 		return
-	# need to make this work maybe not as a instance in function
-	#def get_function(self)
-		#inspect.getmembers(self.equation,predicate=inspect.ismethod)[1]
+
 
 class heavy(object):
 	'''
