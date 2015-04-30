@@ -1,0 +1,11 @@
+This is a function file it should be 1 row for every function such as:
+Functions are between # and float value are between * 
+#heavy# *time* *heavyTime*
+#inverseHeavy# *time* *heavyTime*
+#trend# *time* *slope* *bias*
+#periodAnn# *time* *Cosine_Amplitude* *Sine_Amplitude*
+#periodSemiAnn# *time* *Cosine_Amplude* *Sine_Amplitude"
+#jump# *time* *jump time* *amplitude*
+#exponential# *time* *amplitude* *exponential_start_time* *relaxation_time*
+#sse# *time* *median_time* *duration* *amplitude
+

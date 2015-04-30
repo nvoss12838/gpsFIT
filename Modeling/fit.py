@@ -52,7 +52,7 @@ class heavy(object):
 	  self.t = t
 	  self.t0 = t0
 
-	def heaveside(self):
+	def heavyside(self):
 	  if self.t<self.t0:
 	    x = 0
 	  else:
@@ -147,7 +147,7 @@ class jump(object):
 		self.G = G
 
 	def jump(self):
-		y = self.G*heavy(self.t,self.t0)
+		y = self.G*heavy(self.t,self.t0).heavyside()
 		return y
 
 class exponential(object):
@@ -186,5 +186,5 @@ class sse(object):
 		self.U =  U 
  
 	def sse(self):
-		y = 0.5*self.U*((np.tanh((self.t-self.t0)/self.tau))-1)
+		y = 0.5*self.U*((np.tanh((self.t-self.t01)/self.tau))-1)
 		return y 
