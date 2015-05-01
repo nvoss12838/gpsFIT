@@ -54,7 +54,8 @@ def parseFunFile(functionFile):
     for line in lines:
       functiontxt = line.split(' ')
       function = functiontxt[0]
-      args = [float(item) for item in functiontxt[1:]]
-      funList.append(eval(function)(*args))
+      if function != '#':
+	args = [float(item) for item in functiontxt[1:]]
+	funList.append(eval(function)(*args))
     return funList
     
