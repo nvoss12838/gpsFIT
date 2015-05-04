@@ -151,10 +151,10 @@ def create_network(name,purpose,organization,networkFolder):
 	    directories.append(directory)
 	stations = directories[0][1]
 	stationObjects = []
-	for i in range(1,len(stations)):
-	  latFile = glob.glob(directories[i][0] + '/*.lat')[0]
-	  lonFile = glob.glob(directories[i][0] + '/*.lon')[0]
-	  radFile = glob.glob(directories[i][0] + '/*.rad')[0]
+	for i in range(0,len(stations)):
+	  latFile = glob.glob(directories[i+1][0] + '/*.lat')[0]
+	  lonFile = glob.glob(directories[i+1][0] + '/*.lon')[0]
+	  radFile = glob.glob(directories[i+1][0] + '/*.rad')[0]
 	  t,llat,ulat =  readData(latFile)
 	  lat = timeseries('Latitude',t,llat,ulat)
 	  t,llon,ulon = readData(lonFile)

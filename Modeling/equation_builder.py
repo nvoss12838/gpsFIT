@@ -39,7 +39,10 @@ def model_tseries(times,funList):
   modeledData = []
   for t in times:
       for fun in funList:
-	  fun.t = t 
+	  fun.t = t
+	  if fun.name == 'trend' or fun.name == 'periodAnn' or fun.name == 'periodSemiAnn':
+	    fun.t0 = min(times)
+	    
       fun = function(funList)
       modeledData.append(compute(fun))
   writeModelData(times,modeledData)

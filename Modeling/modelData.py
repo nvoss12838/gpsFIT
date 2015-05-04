@@ -19,4 +19,4 @@ sta = cr.get_station(stationName)
 times = sta.times
 
 funList = parseFunFile(functionFile)
-model_tseries(times,funList)
+data = model_tseries(times,funList)
