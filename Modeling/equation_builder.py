@@ -28,6 +28,7 @@ def compute(fun):
 
 def writeModelData(times,modeledData):
    f = open('modelTseries.txt','w')
+   f.write('model \n')
    for i in range(len(times)):
      f.write('%s	%s\n' % (times[i],modeledData[i]))
    return
@@ -58,7 +59,10 @@ def parseFunFile(functionFile):
       functiontxt = line.split(' ')
       function = functiontxt[0]
       if function != '#':
-	args = [float(item) for item in functiontxt[1:]]
-	funList.append(eval(function)(*args))
+        args = [float(item) for item in functiontxt[1:]]
+        args.insert(0,0)
+        if function == 'trend' or function == 'periodAnn' or function == 'periodSemiAnn':
+          args.insert(0,0)
+        funList.append(eval(function)(*args))
     return funList
     
