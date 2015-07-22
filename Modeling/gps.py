@@ -3,7 +3,7 @@ import os
 import glob
 import numpy as np
 import pickle
-
+import scipy.io 
 class timeseries(object):
       '''
       timeseries is an object for holding individual components of GPS timeseries
@@ -165,4 +165,63 @@ def create_network(name,purpose,organization,networkFolder):
 	net = network(name,purpose,organization,stationObjects)
 	return net
     
-		
+def network2Struct(network,filname,units):
+    
+    '''
+    Takes gps python network object and converts it to matlab S structure and saves 
+    as a .mat file for use with the NIF code
+    
+    Paramaters:
+        network is a network of GPS sites
+        filename is the output .m file name
+        units is the units of the GPS timeseries stored in the structure
+    Matlab object (S) description:
+    S attributes:
+        sites : cell array of Site Names (string
+        decyr : cell array, one cell for every site containing array of times
+        de: Cell array, one cell for every site conaining East dimension IN M
+        dn:'                                             'North'             '
+        du:'                                             'Up'                '
+        cove:Cell array, one cell for every site containing East Covariance IN M
+        covn:'                                              North            '
+        covu:'                                              Up               '
+        
+    '''
+    
+    sites = network.sites
+    decyr,de,dn,du,cove,covn,covu = []
+    if units == 'cm':
+        scale = 0.01
+    if units == 'mm':
+        scale  = 0.001
+    if units == 'm':
+        scale = 1
+        
+    for i in range(len(sites)):
+        decyr.append(scaleObs(network.sites[i].times,scale))
+        de.append(scaleObs(network.sites[i].lon.location,scale))
+        dn.append(scaleObs(network.sites[i].lat.location,scale))
+        du.append(scaleObs(network.sites[i].vert.location,scale))
+        cove.append(scaleObs(network.sites[i].lon.uncertainty,scale))
+        covn.append(scaleObs(network.sites[i].lat.uncertainty,scale))
+        covu.append(scaleObs(network.sites[i].vert.uncertainty,scale))
+    
+    return 
+
+def scaleObs(array,scale):
+    scaled = []
+    for obs in array:
+        scaled.append(obs*scale)
+    return scaled
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
