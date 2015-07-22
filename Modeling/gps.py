@@ -187,9 +187,12 @@ def network2Struct(network,filname,units):
         covu:'                                              Up               '
         
     '''
-    
+    #create the sites array
     sites = network.sites
-    decyr,de,dn,du,cove,covn,covu = []
+    #create arrays to store the data
+    decyr,de,dn,du,cove,covn,covu = [],[],[],[],[],[],[]
+    
+    #make sure the observation does not have to be scaled
     if units == 'cm':
         scale = 0.01
     if units == 'mm':
@@ -205,6 +208,10 @@ def network2Struct(network,filname,units):
         cove.append(scaleObs(network.sites[i].lon.uncertainty,scale))
         covn.append(scaleObs(network.sites[i].lat.uncertainty,scale))
         covu.append(scaleObs(network.sites[i].vert.uncertainty,scale))
+    
+    S = {'Sites':sites,'Decimal Years':decyr,'East Displacement':de,'North Displacement':dn,\
+        'Vertical Displacement':du,'East Cov':cove,'North Cov':covn,'Up Cov':covu}
+    scipy.io.savemat('network.mat',S, oned_as = 'column')
     
     return 
 
