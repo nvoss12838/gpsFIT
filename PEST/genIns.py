@@ -2,11 +2,11 @@ import numpy as np
 import pickle
 
 network = '../Data/Costa_Rica.p'
-stationName = 'bon2'
+stationName = 'pne2'
 cr = pickle.load(open(network, "rb" ))
 sta = cr.get_station(stationName)
 times = sta.times
-f = open('model.ins', 'w')
+f = open('/home/nvoss/Geodesy/CR_2014/model.ins', 'w')
 f.write('pif @ \n')
 f.write('@model@\n')
 #f.write('l1 w !obs1! \n')

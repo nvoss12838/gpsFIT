@@ -94,7 +94,7 @@ class trend(object):
 		self.b = b
 
 	def trend(self):
-		y = self.m*(self.t -self.t0)+ self.b  
+		y = self.m*(self.t - self.t0) + self.b  
 		return y
 
 class periodAnn(object):
@@ -120,6 +120,8 @@ class periodSemiAnn(object):
 	'''
 	semi-annual period
 
+	test
+
 	Attributes:
 		t = time
 		A3 = Annual Cosine Amplitude
@@ -132,12 +134,12 @@ class periodSemiAnn(object):
 		self.A4 = A4 
 
 	def semiannual(self):
-		y = self.A3*np.cos((.0*np.pi*(self.t-self.t0)) + self.A4*np.sin(4.0*np.pi*(self.t-self.t0))
+		y = self.A3*np.cos(4.0*np.pi*(self.t-self.t0)) + self.A4*np.sin(4.0*np.pi*(self.t-self.t0))
 		return y 
 
 class jump(object):
 	'''
-	jump (either antenna change or earthquake
+	jump (either antenna change or earthquake)
   
 	Attributes:
 		t : time

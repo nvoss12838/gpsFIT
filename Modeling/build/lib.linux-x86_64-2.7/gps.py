@@ -3,6 +3,8 @@ import os
 import glob
 import numpy as np
 import pickle
+from fit import *
+from equation_builder import *
 
 class timeseries(object):
       '''
@@ -22,8 +24,23 @@ class timeseries(object):
       def get_component(self):
 	return self.component
 
-      def get_times(self):
-	return self.times
+      def get_times(self,**kwargs):
+	'''
+	arguments = None
+	kwargs : windows = starttime,endtime
+	'''
+	window = kwards.get('window')
+	if 'window' in locals:
+	  start = windows[0] 
+	  end = windows [2]
+	  t = []
+	  for time in self.times:
+	    if time > start and time < end:
+	      t.append.time
+	else:
+	  t = self.times
+	
+	return t
 
       def get_location(self):
 	return self.location
@@ -67,18 +84,36 @@ class station(object):
 	def get_location(self):
 		return self.location
 
-	def plot_tseries(self):
+	def plot_tseries(self,**kwargs):
+		'''
+		plots all 3 component data
+		Optional arguments: specify 3 function files for plotting as an array i.e. fun = [funX,funY,funZ]
+		'''
+		fun = kwargs.get('fun')
 		plt.subplot(311)
 		plt.title(self.name)
 		plt.scatter(self.times,self.lat.location, c = 'r', label = 'Northing')
+		if 'fun' in locals():
+			funList = parseFunFile(fun[1])
+			data = model_tseries(self.times,funList)
+			plt.plot(self.times,data)
 		plt.ylabel('Northing')
 		plt.subplot(312)
 		plt.ylabel('Easting')
 		plt.scatter(self.times,self.lon.location, c = 'b', label = 'Easting')
+		if 'fun' in locals():
+			funList = parseFunFile(fun[0])
+			data = model_tseries(self.times,funList)
+			plt.plot(self.times,data)
 		plt.subplot(313)
 		plt.ylabel('Up')
 		plt.xlabel('Time')
 		plt.scatter(self.times,self.vert.location,c = 'g', label = 'Up')
+		if 'fun' in locals():
+			funList = parseFunFile(fun[2])
+			data = model_tseries(self.times,funList)
+			plt.plot(self.times,data)
+		plt.savefig('station_model.jpg')
 		plt.show()
 
 class network(object):
@@ -151,10 +186,10 @@ def create_network(name,purpose,organization,networkFolder):
 	    directories.append(directory)
 	stations = directories[0][1]
 	stationObjects = []
-	for i in range(1,len(stations)):
-	  latFile = glob.glob(directories[i][0] + '/*.lat')[0]
-	  lonFile = glob.glob(directories[i][0] + '/*.lon')[0]
-	  radFile = glob.glob(directories[i][0] + '/*.rad')[0]
+	for i in range(0,len(stations)):
+	  latFile = glob.glob(directories[i+1][0] + '/*.lat')[0]
+	  lonFile = glob.glob(directories[i+1][0] + '/*.lon')[0]
+	  radFile = glob.glob(directories[i+1][0] + '/*.rad')[0]
 	  t,llat,ulat =  readData(latFile)
 	  lat = timeseries('Latitude',t,llat,ulat)
 	  t,llon,ulon = readData(lonFile)

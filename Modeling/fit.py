@@ -135,7 +135,7 @@ class periodSemiAnn(object):
 		self.name = 'periodSemiAnn'
 
 	def semiannual(self):
-		y = self.A3*np.cos((4.0*np.pi*(self.t-self.t0))) + self.A4*np.sin((4.0*np.pi*(self.t-self.t0)))
+		y = self.A3*np.cos(4.0*np.pi*(self.t-self.t0)) + self.A4*np.sin(4.0*np.pi*(self.t-self.t0))
 		return y 
 
 class jump(object):
@@ -196,5 +196,5 @@ class sse(object):
 		self.name = 'sse'
  
 	def sse(self):
-		y = 0.5*self.U*((np.tanh((self.t-self.t01)/(self.tau/365.0)))-1)
+		y = 0.5*self.U*(np.tanh((self.t-self.t01)/(self.tau/365.0))-1)
 		return y 

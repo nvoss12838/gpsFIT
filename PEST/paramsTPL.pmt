@@ -8,6 +8,8 @@
  g           
  afeq        
  h           
+ jt          
+ jump        
  c           
  ctau        
  d           

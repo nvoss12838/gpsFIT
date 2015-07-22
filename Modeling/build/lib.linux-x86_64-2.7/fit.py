@@ -49,6 +49,7 @@ class heavy(object):
 	def __init__(self,t,t0):
 	  self.t = t
 	  self.t0 = t0
+	  self.name = 'heavy'
 
 	def heavyside(self):
 	  if self.t<self.t0:
@@ -68,6 +69,7 @@ class inverseHeavy(object):
 	def __init__(self,t,t0):
 		self.t = t
 		self.t0 = t0
+		self.name = 'invHeavy'
 
 	def invHeavy(self):
 		if self.t>self.t0:
@@ -85,13 +87,15 @@ class trend(object):
 		m : the slope
 		b : the bias
 	'''
-	def __init__(self,t,m,b):
+	def __init__(self,t0,t,m,b):
+		self.t0 = t0
 		self.t = t 
 		self.m = m
 		self.b = b
+		self.name = 'trend'
 
 	def trend(self):
-		y = self.m*self.t + self.b  
+		y = self.m*(self.t-self.t0) + self.b  
 		return y
 
 class periodAnn(object):
@@ -103,13 +107,15 @@ class periodAnn(object):
 		A1 = Annual Cosine Amplitude
 		A2 = Annual Sin Amplitude
 	'''
-	def __init__(self,t,A1,A2):
+	def __init__(self,t,t0,A1,A2):
+		self.t0 = t0
 		self.t 	= t 
 		self.A1 = A1
 		self.A2 = A2
+		self.name = 'periodAnn'
 
 	def annual(self):
-		y = self.A1*np.cos(2.0*np.pi*self.t) + self.A2*np.sin(2.0*np.pi*self.t)
+		y = self.A1*np.cos(2.0*np.pi*(self.t-self.t0)) + self.A2*np.sin(2.0*np.pi*(self.t-self.t0))
 		return y 
 
 class periodSemiAnn(object):
@@ -121,13 +127,15 @@ class periodSemiAnn(object):
 		A3 = Annual Cosine Amplitude
 		A4 = Annual Sin Amplitude
 	'''
-	def __init__(self,t,A3,A4):
+	def __init__(self,t,t0,A3,A4):
 		self.t = t
+		self.t0 = t0
 		self.A3 = A3
 		self.A4 = A4 
+		self.name = 'periodSemiAnn'
 
 	def semiannual(self):
-		y = self.A3*np.cos((4.0*np.pi*self.t)) + self.A4*np.sin((4.0*np.pi*self.t))
+		y = self.A3*np.cos(4.0*np.pi*(self.t-self.t0)) + self.A4*np.sin(4.0*np.pi*(self.t-self.t0))
 		return y 
 
 class jump(object):
@@ -143,6 +151,7 @@ class jump(object):
 		self.t = t
 		self.t0 = t0
 		self.G = G
+		self.name = 'jump'
 
 	def jump(self):
 		y = self.G*heavy(self.t,self.t0).heavyside()
@@ -163,9 +172,11 @@ class exponential(object):
 		self.C = C 
 		self.eqt = eqt
 		self.tau = tau
+		self.name = 'exponential'
 
-	def exponential(self):	
-		y = self.C*(1.0-np.exp(-(self.t-self.eqt)/(self.tau/365.0)))
+	def exponential(self):
+		h = heavy(self.t,self.eqt)
+		y = h.heavyside()*self.C*(1.0-np.exp(-(self.t-self.eqt)/(self.tau/365.0)))
 		return y 
 
 class sse(object):
@@ -182,7 +193,8 @@ class sse(object):
 		self.t01 = t01
 		self.tau = tau
 		self.U =  U 
+		self.name = 'sse'
  
 	def sse(self):
-		y = 0.5*self.U*((np.tanh((self.t-self.t01)/self.tau))-1)
+		y = 0.5*self.U*(np.tanh((self.t-self.t01)/(self.tau/365.0))-1)
 		return y 
