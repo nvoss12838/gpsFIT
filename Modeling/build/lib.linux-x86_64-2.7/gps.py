@@ -3,6 +3,7 @@ import os
 import glob
 import numpy as np
 import pickle
+import scipy.io 
 from fit import *
 from equation_builder import *
 
@@ -46,7 +47,7 @@ class timeseries(object):
 	return self.location
       
       def get_uncertainty(self):
-	return self.unvertianty
+	return self.uncertianty
       
       def plot(self):
 	plt.errorbar(self.times, self.location, yerr= self.uncertainty)
@@ -153,6 +154,15 @@ class network(object):
 	    print index, station.name
 	    index += 1
 	  return
+	def get_stations(self):
+	  print 'There are %s stations in network:' % len(self.stations)
+	  stationList = []
+	  index = 0
+	  for station in self.stations:
+	    stationList.append(station.name)
+	    index += 1
+	  return stationList
+
 	def save(self):
 	  pickle.dump(self,open(self.name+".p","wb"))
 	  return 
@@ -163,7 +173,7 @@ def readData(filename):
 	date location uncertainty?
 	'''
 	#read in filename splitting into useful python arrays 
-	date,loc,uncert = np.genfromtxt(filename,dtype=float,usecols = (0,1,2), unpack = True)
+	date,loc,uncert = np.genfromtxt(filename,dtype=float,usecols = (0,1,2), unpack = True, skiprows = 1)
 	dateNum = [float(d) for d in date]
 	loc = [float(l) for l in loc]
 	uncert = [float(x) for x in uncert]
@@ -187,9 +197,10 @@ def create_network(name,purpose,organization,networkFolder):
 	stations = directories[0][1]
 	stationObjects = []
 	for i in range(0,len(stations)):
-	  latFile = glob.glob(directories[i+1][0] + '/*.lat')[0]
-	  lonFile = glob.glob(directories[i+1][0] + '/*.lon')[0]
-	  radFile = glob.glob(directories[i+1][0] + '/*.rad')[0]
+	  latFile = glob.glob(directories[i+1][0] + '/*.lat.*.txt')[0]
+	  lonFile = glob.glob(directories[i+1][0] + '/*.lon*.txt')[0]
+	  radFile = glob.glob(directories[i+1][0] + '/*.rad*.txt')[0]
+	  print latFile
 	  t,llat,ulat =  readData(latFile)
 	  lat = timeseries('Latitude',t,llat,ulat)
 	  t,llon,ulon = readData(lonFile)
@@ -200,4 +211,70 @@ def create_network(name,purpose,organization,networkFolder):
 	net = network(name,purpose,organization,stationObjects)
 	return net
     
-		
+def network2Struct(network,filname,units):
+    
+    '''
+    Takes gps python network object and converts it to matlab S structure and saves 
+    as a .mat file for use with the NIF code
+    
+    Paramaters:
+        network is a network of GPS sites
+        filename is the output .m file name
+        units is the units of the GPS timeseries stored in the structure
+    Matlab object (S) description:
+    S attributes:
+        sites : cell array of Site Names (string
+        decyr : cell array, one cell for every site containing array of times
+        de: Cell array, one cell for every site conaining East dimension IN M
+        dn:'                                             'North'             '
+        du:'                                             'Up'                '
+        cove:Cell array, one cell for every site containing East Covariance IN M
+        covn:'                                              North            '
+        covu:'                                              Up               '
+        
+    '''
+    #create the sites array
+    sites = network.get_stations()
+    #create arrays to store the data
+    decyr,de,dn,du,cove,covn,covu = [],[],[],[],[],[],[]
+    
+    #make sure the observation does not have to be scaled
+    if units == 'cm':
+        scale = 0.01
+    if units == 'mm':
+        scale  = 0.001
+    if units == 'm':
+        scale = 1
+        
+    for i in range(len(sites)):
+        decyr.append(network.stations[i].times)
+        de.append(scaleObs(network.stations[i].lon.location,scale))
+        dn.append(scaleObs(network.stations[i].lat.location,scale))
+        du.append(scaleObs(network.stations[i].vert.location,scale))
+        cove.append(scaleObs(np.square(network.stations[i].lon.uncertainty),scale))
+        covn.append(scaleObs(np.square(network.stations[i].lat.uncertainty),scale))
+        covu.append(scaleObs(np.square(network.stations[i].vert.uncertainty),scale))
+    
+    S = {'Sites':sites,'DecimalYears':decyr,'EastDisplacement':de,'NorthDisplacement':dn,\
+        'VerticalDisplacement':du,'EastCov':cove,'NorthCov':covn,'UpCov':covu}
+    scipy.io.savemat(filname,S, oned_as = 'column')
+    
+    return 
+
+def scaleObs(array,scale):
+    scaled = []
+    for obs in array:
+        scaled.append(obs*scale)
+    return scaled
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

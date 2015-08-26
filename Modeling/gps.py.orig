@@ -3,10 +3,13 @@ import os
 import glob
 import numpy as np
 import pickle
-import scipy.io 
+<<<<<<< HEAD
 from fit import *
 from equation_builder import *
 
+=======
+import scipy.io 
+>>>>>>> 87aed011fa305b79209562150940e0f0523579d5
 class timeseries(object):
       '''
       timeseries is an object for holding individual components of GPS timeseries
@@ -154,15 +157,6 @@ class network(object):
 	    print index, station.name
 	    index += 1
 	  return
-	def get_stations(self):
-	  print 'There are %s stations in network:' % len(self.stations)
-	  stationList = []
-	  index = 0
-	  for station in self.stations:
-	    stationList.append(station.name)
-	    index += 1
-	  return stationList
-
 	def save(self):
 	  pickle.dump(self,open(self.name+".p","wb"))
 	  return 
@@ -173,7 +167,7 @@ def readData(filename):
 	date location uncertainty?
 	'''
 	#read in filename splitting into useful python arrays 
-	date,loc,uncert = np.genfromtxt(filename,dtype=float,usecols = (0,1,2), unpack = True, skiprows = 1)
+	date,loc,uncert = np.genfromtxt(filename,dtype=float,usecols = (0,1,2), unpack = True)
 	dateNum = [float(d) for d in date]
 	loc = [float(l) for l in loc]
 	uncert = [float(x) for x in uncert]
@@ -197,10 +191,9 @@ def create_network(name,purpose,organization,networkFolder):
 	stations = directories[0][1]
 	stationObjects = []
 	for i in range(0,len(stations)):
-	  latFile = glob.glob(directories[i+1][0] + '/*.lat.*.txt')[0]
-	  lonFile = glob.glob(directories[i+1][0] + '/*.lon*.txt')[0]
-	  radFile = glob.glob(directories[i+1][0] + '/*.rad*.txt')[0]
-	  print latFile
+	  latFile = glob.glob(directories[i+1][0] + '/*.lat')[0]
+	  lonFile = glob.glob(directories[i+1][0] + '/*.lon')[0]
+	  radFile = glob.glob(directories[i+1][0] + '/*.rad')[0]
 	  t,llat,ulat =  readData(latFile)
 	  lat = timeseries('Latitude',t,llat,ulat)
 	  t,llon,ulon = readData(lonFile)
@@ -234,7 +227,7 @@ def network2Struct(network,filname,units):
         
     '''
     #create the sites array
-    sites = network.get_stations()
+    sites = network.sites
     #create arrays to store the data
     decyr,de,dn,du,cove,covn,covu = [],[],[],[],[],[],[]
     
@@ -247,17 +240,17 @@ def network2Struct(network,filname,units):
         scale = 1
         
     for i in range(len(sites)):
-        decyr.append(network.stations[i].times)
-        de.append(scaleObs(network.stations[i].lon.location,scale))
-        dn.append(scaleObs(network.stations[i].lat.location,scale))
-        du.append(scaleObs(network.stations[i].vert.location,scale))
-        cove.append(scaleObs(np.square(network.stations[i].lon.uncertainty),scale))
-        covn.append(scaleObs(np.square(network.stations[i].lat.uncertainty),scale))
-        covu.append(scaleObs(np.square(network.stations[i].vert.uncertainty),scale))
+        decyr.append(scaleObs(network.sites[i].times,scale))
+        de.append(scaleObs(network.sites[i].lon.location,scale))
+        dn.append(scaleObs(network.sites[i].lat.location,scale))
+        du.append(scaleObs(network.sites[i].vert.location,scale))
+        cove.append(scaleObs(network.sites[i].lon.uncertainty,scale))
+        covn.append(scaleObs(network.sites[i].lat.uncertainty,scale))
+        covu.append(scaleObs(network.sites[i].vert.uncertainty,scale))
     
-    S = {'Sites':sites,'DecimalYears':decyr,'EastDisplacement':de,'NorthDisplacement':dn,\
-        'VerticalDisplacement':du,'EastCov':cove,'NorthCov':covn,'UpCov':covu}
-    scipy.io.savemat(filname,S, oned_as = 'column')
+    S = {'Sites':sites,'Decimal Years':decyr,'East Displacement':de,'North Displacement':dn,\
+        'Vertical Displacement':du,'East Cov':cove,'North Cov':covn,'Up Cov':covu}
+    scipy.io.savemat('network.mat',S, oned_as = 'column')
     
     return 
 
